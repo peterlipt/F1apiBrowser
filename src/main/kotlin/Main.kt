@@ -31,6 +31,7 @@ import kotlinx.coroutines.launch
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.window.DialogWindow
 import androidx.compose.ui.window.rememberDialogState
+import androidx.compose.ui.window.rememberWindowState
 
 // Rendezési mezők definíciója
 enum class SortField(val displayName: String) {
@@ -48,7 +49,11 @@ enum class Screen {
 }
 
 fun main() = application {
-    Window(onCloseRequest = ::exitApplication, title = "F1 Data Browser") {
+    Window(
+        onCloseRequest = ::exitApplication,
+        title = "F1 Data Browser",
+        state = rememberWindowState(width = 1600.dp, height = 1200.dp)
+    ) {
         App()
     }
 }
