@@ -32,17 +32,38 @@ object ApiService {
         return makeApiCall(url) // Kiszervezzük a hívást egy segédfüggvénybe
     }
 
-    // ÚJ függvény egy adott verseny eredményeinek lekérdezéséhez
+    // Meglévő függvény egy adott verseny eredményeinek lekérdezéséhez
     suspend fun getRaceResults(season: String, round: String): Result<ApiResponse> {
-        // Validáljuk, hogy a season és round nem üres
         if (season.isBlank() || round.isBlank()) {
             return Result.failure(IllegalArgumentException("Season and round cannot be empty"))
         }
-        // Összeállítjuk az URL-t a szezonnal és a fordulóval
         val url = "$BASE_URL/$season/$round/results.json"
         println("Fetching URL: $url")
         return makeApiCall(url) // Ugyanazt a segédfüggvényt használjuk
     }
+
+    // ÚJ függvény a versenyzői pontversenyhez
+    suspend fun getDriverStandings(season: String): Result<ApiResponse> {
+        if (season.isBlank()) {
+            return Result.failure(IllegalArgumentException("Season cannot be empty"))
+        }
+        // A 'current' kulcsszót is elfogadja az API
+        val url = "$BASE_URL/$season/driverStandings.json"
+        println("Fetching URL: $url")
+        return makeApiCall(url) // A közös hívó használata
+    }
+
+    // ÚJ függvény a konstruktőri pontversenyhez
+    suspend fun getConstructorStandings(season: String): Result<ApiResponse> {
+        if (season.isBlank()) {
+            return Result.failure(IllegalArgumentException("Season cannot be empty"))
+        }
+        // A 'current' kulcsszót is elfogadja az API
+        val url = "$BASE_URL/$season/constructorStandings.json"
+        println("Fetching URL: $url")
+        return makeApiCall(url) // A közös hívó használata
+    }
+
 
     // Segédfüggvény az API hívás logikájának közösítésére
     private suspend fun makeApiCall(url: String): Result<ApiResponse> {

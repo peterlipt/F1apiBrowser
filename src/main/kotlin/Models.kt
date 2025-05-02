@@ -38,8 +38,11 @@ data class MRData(
     val limit: String,
     val offset: String,
     val total: String,
-    @SerialName("RaceTable") // JSON kulcs: RaceTable, Kotlin property: raceTable
-    val raceTable: RaceTable
+    @SerialName("RaceTable")
+    val raceTable: RaceTable? = null, // Nullázhatóvá tettük
+    // ÚJ: StandingsTable (nullázható, mert nem minden válaszban van)
+    @SerialName("StandingsTable")
+    val standingsTable: StandingsTable? = null
 )
 
 @Serializable
@@ -114,7 +117,6 @@ data class ResultData( // Result helyett ResultData, hogy ne ütközzön a Kotli
     val fastestLap: FastestLap? = null // Leggyorsabb kör adatai (ha van)
 )
 
-// MÓDOSÍTÁS: A meglévő Race class kiegészítése a Results listával
 @Serializable
 data class Race(
     val season: String,
@@ -129,4 +131,43 @@ data class Race(
     val results: List<ResultData>? = null,
     // Az idő nem mindig van a /races válaszban, de a /results igen
     val time: String? = null
+)
+
+@Serializable
+data class StandingsList(
+    val season: String,
+    val round: String? = null,
+    @SerialName("DriverStandings")
+    val driverStandings: List<DriverStanding>? = null,
+    @SerialName("ConstructorStandings")
+    val constructorStandings: List<ConstructorStanding>? = null
+)
+
+@Serializable
+data class StandingsTable(
+    val season: String,
+    @SerialName("StandingsLists")
+    val standingsLists: List<StandingsList> // Általában csak egy elemű lista
+)
+
+@Serializable
+data class DriverStanding(
+    val position: String? = null,
+    val positionText: String,
+    val points: String,
+    val wins: String,
+    @SerialName("Driver")
+    val driver: Driver,
+    @SerialName("Constructors")
+    val constructors: List<Constructor>
+)
+
+@Serializable
+data class ConstructorStanding(
+    val position: String,
+    val positionText: String,
+    val points: String,
+    val wins: String,
+    @SerialName("Constructor")
+    val constructor: Constructor
 )
