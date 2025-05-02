@@ -32,6 +32,28 @@ import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.window.DialogWindow
 import androidx.compose.ui.window.rememberDialogState
 import androidx.compose.ui.window.rememberWindowState
+import androidx.compose.ui.graphics.Color
+import androidx.compose.material.darkColors
+import androidx.compose.ui.res.painterResource
+
+val F1Red = Color(0xFFD50000)
+val F1Black = Color(0xFF1C1C1C)
+val F1White = Color(0xFFFFFFFF)
+val F1Gray = Color(0xFFB0B0B0)
+
+val F1ColorPalette = darkColors(
+    primary = F1Red,
+    primaryVariant = F1Black,
+    secondary = F1Gray,
+    background = F1Black,
+    surface = F1Gray,
+    onPrimary = F1White,
+    onSecondary = F1Black,
+    onBackground = F1White,
+    onSurface = F1Black,
+    error = Color(0xFFB00020),
+    onError = F1White
+)
 
 // Rendezési mezők definíciója
 enum class SortField(val displayName: String) {
@@ -52,7 +74,8 @@ fun main() = application {
     Window(
         onCloseRequest = ::exitApplication,
         title = "F1 Data Browser",
-        state = rememberWindowState(width = 1600.dp, height = 1200.dp)
+        state = rememberWindowState(width = 1600.dp, height = 1200.dp),
+        icon = painterResource("icon.png")
     ) {
         App()
     }
@@ -346,7 +369,7 @@ fun App() {
     }
 
 
-    MaterialTheme {
+    MaterialTheme(colors = F1ColorPalette) {
         Scaffold( // Scaffold a TopAppBar és a képernyőváltás kezeléséhez
             topBar = {
                 TopAppBar(
@@ -355,13 +378,23 @@ fun App() {
                         Button(
                             onClick = { currentScreen = Screen.RACE_LIST },
                             enabled = currentScreen != Screen.RACE_LIST,
-                            colors = ButtonDefaults.buttonColors(backgroundColor = if (currentScreen == Screen.RACE_LIST) MaterialTheme.colors.primaryVariant else MaterialTheme.colors.primary)
+                            colors = ButtonDefaults.buttonColors(
+                                disabledBackgroundColor = MaterialTheme.colors.primary,
+                                disabledContentColor = MaterialTheme.colors.onPrimary,
+                                backgroundColor = MaterialTheme.colors.secondary,
+                                contentColor = MaterialTheme.colors.onSecondary
+                            )
                         ) { Text("Races") }
                         Spacer(Modifier.width(8.dp))
                         Button(
                             onClick = { currentScreen = Screen.STANDINGS },
                             enabled = currentScreen != Screen.STANDINGS,
-                            colors = ButtonDefaults.buttonColors(backgroundColor = if (currentScreen == Screen.STANDINGS) MaterialTheme.colors.primaryVariant else MaterialTheme.colors.primary)
+                            colors = ButtonDefaults.buttonColors(
+                                disabledBackgroundColor = MaterialTheme.colors.primary,
+                                disabledContentColor = MaterialTheme.colors.onPrimary,
+                                backgroundColor = MaterialTheme.colors.secondary,
+                                contentColor = MaterialTheme.colors.onSecondary
+                            )
                         ) { Text("Standings") }
                     }
                 )
@@ -444,15 +477,47 @@ fun RaceListScreen(
                 onValueChange = onSearchQueryChange,
                 label = { Text("General Search...") },
                 modifier = Modifier.weight(1f),
-                singleLine = true
+                singleLine = true,
+                colors = TextFieldDefaults.outlinedTextFieldColors(
+                    backgroundColor = Color(0xFF1C1C1C),
+                    unfocusedBorderColor = Color(0xFFB0B0B0),
+                    unfocusedLabelColor = Color(0xFFB0B0B0),
+                    focusedBorderColor = Color(0xFFD50000),
+                    focusedLabelColor = Color(0xFFD50000),
+                    cursorColor = Color(0xFFD50000)
+                )
             ) // Angolra váltva
             Spacer(modifier = Modifier.width(8.dp))
         }
         Spacer(modifier = Modifier.height(8.dp))
         Row(modifier = Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.spacedBy(8.dp)) {
-            OutlinedTextField(value = yearFilter, onValueChange = { onYearFilterChange(it.filter { c->c.isDigit() }) }, label = { Text("Year") }, modifier = Modifier.weight(1f), singleLine = true)
-            OutlinedTextField(value = circuitFilter, onValueChange = onCircuitFilterChange, label = { Text("Circuit") }, modifier = Modifier.weight(1f), singleLine = true) // Angolra váltva
-            OutlinedTextField(value = countryFilter, onValueChange = onCountryFilterChange, label = { Text("Country") }, modifier = Modifier.weight(1f), singleLine = true) // Angolra váltva
+            OutlinedTextField(value = yearFilter, onValueChange = { onYearFilterChange(it.filter { c->c.isDigit() }) }, label = { Text("Year") }, modifier = Modifier.weight(1f), singleLine = true,
+                colors = TextFieldDefaults.outlinedTextFieldColors(
+                    backgroundColor = Color(0xFF1C1C1C),
+                    unfocusedBorderColor = Color(0xFFB0B0B0),
+                    unfocusedLabelColor = Color(0xFFB0B0B0),
+                    focusedBorderColor = Color(0xFFD50000),
+                    focusedLabelColor = Color(0xFFD50000),
+                    cursorColor = Color(0xFFD50000)
+                ))
+            OutlinedTextField(value = circuitFilter, onValueChange = onCircuitFilterChange, label = { Text("Circuit") }, modifier = Modifier.weight(1f), singleLine = true,
+                colors = TextFieldDefaults.outlinedTextFieldColors(
+                    backgroundColor = Color(0xFF1C1C1C),
+                    unfocusedBorderColor = Color(0xFFB0B0B0),
+                    unfocusedLabelColor = Color(0xFFB0B0B0),
+                    focusedBorderColor = Color(0xFFD50000),
+                    focusedLabelColor = Color(0xFFD50000),
+                    cursorColor = Color(0xFFD50000)
+                )) // Angolra váltva
+            OutlinedTextField(value = countryFilter, onValueChange = onCountryFilterChange, label = { Text("Country") }, modifier = Modifier.weight(1f), singleLine = true,
+                colors = TextFieldDefaults.outlinedTextFieldColors(
+                    backgroundColor = Color(0xFF1C1C1C),
+                    unfocusedBorderColor = Color(0xFFB0B0B0),
+                    unfocusedLabelColor = Color(0xFFB0B0B0),
+                    focusedBorderColor = Color(0xFFD50000),
+                    focusedLabelColor = Color(0xFFD50000),
+                    cursorColor = Color(0xFFD50000)
+                )) // Angolra váltva
         }
         Spacer(modifier = Modifier.height(8.dp))
         Row(modifier = Modifier.fillMaxWidth(), verticalAlignment = Alignment.CenterVertically, horizontalArrangement = Arrangement.spacedBy(8.dp)) {
@@ -556,7 +621,15 @@ fun StandingsScreen(
                 onValueChange = onSeasonChange,
                 label = { Text("Season ('current' or year)") }, // Angolra váltva
                 modifier = Modifier.weight(1f),
-                singleLine = true
+                singleLine = true,
+                colors = TextFieldDefaults.outlinedTextFieldColors(
+                    backgroundColor = Color(0xFF1C1C1C),
+                    unfocusedBorderColor = Color(0xFFB0B0B0),
+                    unfocusedLabelColor = Color(0xFFB0B0B0),
+                    focusedBorderColor = Color(0xFFD50000),
+                    focusedLabelColor = Color(0xFFD50000),
+                    cursorColor = Color(0xFFD50000)
+                )
             )
             Button(
                 onClick = { onFetchStandings(selectedSeason) },
