@@ -1,15 +1,9 @@
-package hu.bme.aut.apitest // Helyettesítsd a saját package neveddel!
-
-import ConstructorStanding
-import DriverStanding
-import Race
-import ResultData
 import androidx.compose.desktop.ui.tooling.preview.Preview
-import androidx.compose.foundation.clickable // Szükséges a clickable-hez
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
-import androidx.compose.foundation.lazy.rememberLazyListState // Szükséges a végtelen görgetéshez
+import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.material.*
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.ArrowDropDown
@@ -18,19 +12,15 @@ import androidx.compose.material.icons.filled.KeyboardArrowUp
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.text.font.FontWeight // Szükséges a Bold-hoz
+import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
-import androidx.compose.ui.window.Dialog // Használhatunk Dialog-ot is AlertDialog helyett
 import androidx.compose.ui.window.Window
 import androidx.compose.ui.window.application
-import androidx.compose.ui.window.rememberDialogState // Dialog méret/pozíció mentéséhez
-import kotlinx.coroutines.flow.collect // Szükséges a snapshotFlow-hoz
-import kotlinx.coroutines.flow.filter // Szükséges a snapshotFlow-hoz
-import kotlinx.coroutines.flow.map // Szükséges a snapshotFlow-hoz
-import kotlinx.coroutines.launch
-import androidx.compose.ui.text.input.KeyboardType
-import androidx.compose.ui.window.DialogWindow
 import androidx.compose.ui.window.rememberDialogState
+import kotlinx.coroutines.flow.filter
+import kotlinx.coroutines.flow.map
+import kotlinx.coroutines.launch
+import androidx.compose.ui.window.DialogWindow
 import androidx.compose.ui.window.rememberWindowState
 import androidx.compose.ui.graphics.Color
 import androidx.compose.material.darkColors
@@ -121,7 +111,7 @@ fun App() {
 
     // --- Függvények ---
 
-    // fetchRaces - Módosítva az új state nevekre
+    // fetchRaces
     fun fetchRaces(loadMore: Boolean = false) {
         if (isLoadingRaces) return
 
@@ -166,7 +156,7 @@ fun App() {
         }
     }
 
-    // fetchAllRemainingRaces - Módosítva az új state nevekre
+    // fetchAllRemainingRaces
     fun fetchAllRemainingRaces() {
         if (isLoadingRaces || (totalRaces > 0 && allRaces.size >= totalRaces)) {
             println("Fetch All: Skipped (isLoadingRaces=$isLoadingRaces, size=${allRaces.size}, total=$totalRaces)")
@@ -268,7 +258,7 @@ fun App() {
         }
     }
 
-    // fetchRaceDetails (dialógushoz - változatlan maradt ebben a körben)
+    // fetchRaceDetails
     fun fetchRaceDetails(race: Race) {
         selectedRaceForDetails = race
         raceResultsData = null
@@ -295,7 +285,7 @@ fun App() {
         }
     }
 
-    // fetchStandings (Új függvény a pontversenyhez)
+    // fetchStandings
     fun fetchStandings(season: String) {
         if (isLoadingStandings) return
         isLoadingStandings = true
@@ -337,12 +327,12 @@ fun App() {
         }
     }
 
-    // Kezdeti adatlekérések (marad)
+    // Kezdeti adatlekérések
     LaunchedEffect(Unit) {
         fetchRaces(loadMore = false)
     }
 
-    // filteredRaces és displayedRaces számítása (marad)
+    // filteredRaces és displayedRaces számítása
     val filteredRaces = remember(searchQuery, yearFilter, circuitFilter, countryFilter, allRaces) {
         var currentlyFiltered = allRaces
         if (yearFilter.isNotBlank()) { currentlyFiltered = currentlyFiltered.filter { it.season == yearFilter } }
@@ -399,11 +389,11 @@ fun App() {
                     }
                 )
             }
-        ) { paddingValues -> // Padding a Scaffold tartalmának
-            Box(modifier = Modifier.padding(paddingValues)) { // Box a dialógus és a képernyő tartalmának rétegezéséhez
+        ) { paddingValues ->
+            Box(modifier = Modifier.padding(paddingValues)) {
                 // Képernyő váltás a currentScreen state alapján
                 when (currentScreen) {
-                    Screen.RACE_LIST -> RaceListScreen( // Átadjuk a szükséges state-eket és callback-eket
+                    Screen.RACE_LIST -> RaceListScreen(
                         allRaces = allRaces,
                         searchQuery = searchQuery, onSearchQueryChange = { searchQuery = it },
                         yearFilter = yearFilter, onYearFilterChange = { yearFilter = it },
@@ -413,7 +403,6 @@ fun App() {
                         raceListError = raceListError,
                         totalRaces = totalRaces,
                         progress = progress,
-                        reverseOrder = reverseOrder, onReverseOrderChange = { reverseOrder = it },
                         sortField = sortField, onSortFieldChange = { sortField = it },
                         sortAscending = sortAscending, onSortAscendingChange = { sortAscending = it },
                         displayedRaces = displayedRaces,
@@ -421,7 +410,7 @@ fun App() {
                         onFetchAllRemainingRaces = ::fetchAllRemainingRaces,
                         onRaceClick = ::fetchRaceDetails
                     )
-                    Screen.STANDINGS -> StandingsScreen( // Átadjuk a szükséges state-eket és callback-eket
+                    Screen.STANDINGS -> StandingsScreen(
                         selectedSeason = standingsSeason, onSeasonChange = { standingsSeason = it },
                         driverStandings = driverStandings,
                         constructorStandings = constructorStandings,
@@ -431,7 +420,7 @@ fun App() {
                     )
                 }
 
-                // Race Details dialógus (marad a fő App szintjén, hogy bármelyik képernyő felett megjelenhessen)
+                // Race Details dialógus
                 if (showDetailsDialog && selectedRaceForDetails != null) {
                     RaceResultsDialog(
                         race = selectedRaceForDetails!!,
@@ -447,7 +436,7 @@ fun App() {
 }
 
 
-// --- RaceListScreen Composable (Új/Kiszervezett + Végtelen Görgetés) ---
+// --- RaceListScreen Composable ---
 @Composable
 fun RaceListScreen(
     allRaces: List<Race>,
@@ -459,7 +448,6 @@ fun RaceListScreen(
     raceListError: String?,
     totalRaces: Int,
     progress: Float,
-    reverseOrder: Boolean, onReverseOrderChange: (Boolean) -> Unit,
     sortField: SortField, onSortFieldChange: (SortField) -> Unit,
     sortAscending: Boolean, onSortAscendingChange: (Boolean) -> Unit,
     displayedRaces: List<Race>,
@@ -486,7 +474,7 @@ fun RaceListScreen(
                     focusedLabelColor = Color(0xFFD50000),
                     cursorColor = Color(0xFFD50000)
                 )
-            ) // Angolra váltva
+            )
             Spacer(modifier = Modifier.width(8.dp))
         }
         Spacer(modifier = Modifier.height(8.dp))
@@ -508,7 +496,7 @@ fun RaceListScreen(
                     focusedBorderColor = Color(0xFFD50000),
                     focusedLabelColor = Color(0xFFD50000),
                     cursorColor = Color(0xFFD50000)
-                )) // Angolra váltva
+                ))
             OutlinedTextField(value = countryFilter, onValueChange = onCountryFilterChange, label = { Text("Country") }, modifier = Modifier.weight(1f), singleLine = true,
                 colors = TextFieldDefaults.outlinedTextFieldColors(
                     backgroundColor = Color(0xFF1C1C1C),
@@ -517,31 +505,31 @@ fun RaceListScreen(
                     focusedBorderColor = Color(0xFFD50000),
                     focusedLabelColor = Color(0xFFD50000),
                     cursorColor = Color(0xFFD50000)
-                )) // Angolra váltva
+                ))
         }
         Spacer(modifier = Modifier.height(8.dp))
         Row(modifier = Modifier.fillMaxWidth(), verticalAlignment = Alignment.CenterVertically, horizontalArrangement = Arrangement.spacedBy(8.dp)) {
-            Text("Sort by:", modifier = Modifier.align(Alignment.CenterVertically)) // Angolra váltva
+            Text("Sort by:", modifier = Modifier.align(Alignment.CenterVertically))
             var expanded by remember { mutableStateOf(false) }
             Box {
-                OutlinedButton(onClick = { expanded = true }) { Text(sortField.displayName); Icon(Icons.Default.ArrowDropDown, contentDescription = "Select sort field") } // Angolra váltva
+                OutlinedButton(onClick = { expanded = true }) { Text(sortField.displayName); Icon(Icons.Default.ArrowDropDown, contentDescription = "Select sort field") }
                 DropdownMenu(expanded = expanded, onDismissRequest = { expanded = false }) {
                     SortField.entries.forEach { field -> DropdownMenuItem(onClick = { onSortFieldChange(field); expanded = false }) { Text(field.displayName) } }
                 }
             }
-            IconButton(onClick = { onSortAscendingChange(!sortAscending) }) { Icon(if (sortAscending) Icons.Default.KeyboardArrowUp else Icons.Default.KeyboardArrowDown, contentDescription = if (sortAscending) "Ascending" else "Descending") } // Angolra váltva
-            Text(if (sortAscending) "Asc" else "Desc", modifier = Modifier.align(Alignment.CenterVertically)) // Angolra váltva
+            IconButton(onClick = { onSortAscendingChange(!sortAscending) }) { Icon(if (sortAscending) Icons.Default.KeyboardArrowUp else Icons.Default.KeyboardArrowDown, contentDescription = if (sortAscending) "Ascending" else "Descending") }
+            Text(if (sortAscending) "Asc" else "Desc", modifier = Modifier.align(Alignment.CenterVertically))
 
         }
         Spacer(modifier = Modifier.height(8.dp))
         if (isLoadingRaces && progress > 0f) {
             LinearProgressIndicator(progress = progress, modifier = Modifier.fillMaxWidth().height(6.dp))
-            Text("Loading all races: ${allRaces.size} / $totalRaces (${(progress * 100).toInt()}%)", style = MaterialTheme.typography.caption, modifier = Modifier.align(Alignment.CenterHorizontally)) // Angolra váltva
+            Text("Loading all races: ${allRaces.size} / $totalRaces (${(progress * 100).toInt()}%)", style = MaterialTheme.typography.caption, modifier = Modifier.align(Alignment.CenterHorizontally))
             Spacer(modifier = Modifier.height(8.dp))
         } else { Spacer(modifier = Modifier.height(14.dp)) }
         Row(modifier = Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.SpaceEvenly) {
-            Button(onClick = { onFetchRaces(false) }, enabled = !isLoadingRaces) { Text("Reload") } // Angolra váltva
-            Button(onClick = onFetchAllRemainingRaces, enabled = !isLoadingRaces && (totalRaces == 0 || allRaces.size < totalRaces)) { Text("Load All") } // Angolra váltva
+            Button(onClick = { onFetchRaces(false) }, enabled = !isLoadingRaces) { Text("Reload") }
+            Button(onClick = onFetchAllRemainingRaces, enabled = !isLoadingRaces && (totalRaces == 0 || allRaces.size < totalRaces)) { Text("Load All") }
         }
         Spacer(modifier = Modifier.height(16.dp))
         if (raceListError != null && !isLoadingRaces) { Text("Error: $raceListError", color = MaterialTheme.colors.error); Spacer(modifier = Modifier.height(8.dp)) }
@@ -568,7 +556,7 @@ fun RaceListScreen(
                             CircularProgressIndicator()
                         }
                         else if (!isLoadingRaces && allRaces.size >= totalRaces && totalRaces > 0) {
-                            Text("All races loaded (${allRaces.size})", textAlign = androidx.compose.ui.text.style.TextAlign.Center) // Angolra váltva
+                            Text("All races loaded (${allRaces.size})", textAlign = androidx.compose.ui.text.style.TextAlign.Center)
                         }
                     }
                     Spacer(modifier = Modifier.height(16.dp))
@@ -587,7 +575,7 @@ fun RaceListScreen(
                         lastVisibleIndex != null &&
                                 !isLoadingRaces &&
                                 allRaces.size < totalRaces &&
-                                lastVisibleIndex >= allRaces.size - 5 // Küszöbérték
+                                lastVisibleIndex >= allRaces.size - 5
                     }
                     .collect {
                         println("Reached end of list (last visible index: $it), loading more...")
@@ -599,7 +587,7 @@ fun RaceListScreen(
 }
 
 
-// --- StandingsScreen Composable (Új) ---
+// --- StandingsScreen Composable ---
 @Composable
 fun StandingsScreen(
     selectedSeason: String,
@@ -619,7 +607,7 @@ fun StandingsScreen(
             OutlinedTextField(
                 value = selectedSeason,
                 onValueChange = onSeasonChange,
-                label = { Text("Season ('current' or year)") }, // Angolra váltva
+                label = { Text("Season ('current' or year)") },
                 modifier = Modifier.weight(1f),
                 singleLine = true,
                 colors = TextFieldDefaults.outlinedTextFieldColors(
@@ -635,7 +623,7 @@ fun StandingsScreen(
                 onClick = { onFetchStandings(selectedSeason) },
                 enabled = !isLoading && selectedSeason.isNotBlank()
             ) {
-                Text("Fetch Standings") // Angolra váltva
+                Text("Fetch Standings")
             }
         }
 
@@ -646,21 +634,21 @@ fun StandingsScreen(
                 CircularProgressIndicator()
             }
         } else if (error != null) {
-            Text("Error: $error", color = MaterialTheme.colors.error) // Angolra váltva
+            Text("Error: $error", color = MaterialTheme.colors.error)
         } else {
             Row(
                 modifier = Modifier.fillMaxWidth().weight(1f),
                 horizontalArrangement = Arrangement.spacedBy(16.dp)
             ) {
                 Column(modifier = Modifier.weight(1f)) {
-                    Text("Driver Standings", style = MaterialTheme.typography.h6) // Angolra váltva
+                    Text("Driver Standings", style = MaterialTheme.typography.h6)
                     Spacer(modifier = Modifier.height(8.dp))
                     StandingsTableComposable(standings = driverStandings) { standing ->
                         DriverStandingRow(standing as DriverStanding)
                     }
                 }
                 Column(modifier = Modifier.weight(1f)) {
-                    Text("Constructor Standings", style = MaterialTheme.typography.h6) // Angolra váltva
+                    Text("Constructor Standings", style = MaterialTheme.typography.h6)
                     Spacer(modifier = Modifier.height(8.dp))
                     StandingsTableComposable(standings = constructorStandings) { standing ->
                         ConstructorStandingRow(standing as ConstructorStanding)
@@ -671,7 +659,7 @@ fun StandingsScreen(
     }
 }
 
-// --- Általános Composable a pontverseny táblázathoz (Új) ---
+// --- Általános Composable a pontverseny táblázathoz ---
 @Composable
 fun <T> StandingsTableComposable(
     standings: List<T>?,
@@ -681,7 +669,7 @@ fun <T> StandingsTableComposable(
     Card(elevation = 2.dp) {
         Column {
             if (standings.isNullOrEmpty()) {
-                Text("No data available.", modifier = Modifier.padding(16.dp)) // Angolra váltva
+                Text("No data available.", modifier = Modifier.padding(16.dp))
             } else {
                 LazyColumn {
                     item {
@@ -698,7 +686,7 @@ fun <T> StandingsTableComposable(
     }
 }
 
-// --- Alapértelmezett fejléc a pontversenyhez (Új) ---
+// --- Alapértelmezett fejléc a pontversenyhez ---
 @Composable
 fun DefaultStandingsHeader() {
     Row(
@@ -706,13 +694,13 @@ fun DefaultStandingsHeader() {
         verticalAlignment = Alignment.CenterVertically
     ) {
         Text("Pos", fontWeight = FontWeight.Bold, modifier = Modifier.width(40.dp))
-        Text("Name", fontWeight = FontWeight.Bold, modifier = Modifier.weight(1f)) // Angolra váltva
+        Text("Name", fontWeight = FontWeight.Bold, modifier = Modifier.weight(1f))
         Text("Pts", fontWeight = FontWeight.Bold, modifier = Modifier.width(50.dp), textAlign = androidx.compose.ui.text.style.TextAlign.End)
         Text("Wins", fontWeight = FontWeight.Bold, modifier = Modifier.width(50.dp), textAlign = androidx.compose.ui.text.style.TextAlign.End)
     }
 }
 
-// --- Composable egy DriverStanding sorhoz (Új) ---
+// --- Composable egy DriverStanding sorhoz ---
 @Composable
 fun DriverStandingRow(standing: DriverStanding) {
     Row(
@@ -741,14 +729,14 @@ fun DriverStandingRow(standing: DriverStanding) {
     }
 }
 
-// --- Composable egy ConstructorStanding sorhoz (Új) ---
+// --- Composable egy ConstructorStanding sorhoz ---
 @Composable
 fun ConstructorStandingRow(standing: ConstructorStanding) {
     Row(
         modifier = Modifier.fillMaxWidth().padding(vertical = 8.dp),
         verticalAlignment = Alignment.CenterVertically
     ) {
-        Text(standing.position, modifier = Modifier.width(40.dp))
+        Text(standing.position ?: "-", modifier = Modifier.width(40.dp)) // Provide a default value for null position
         Text(
             standing.constructor.name,
             modifier = Modifier.weight(1f),
@@ -763,7 +751,7 @@ fun ConstructorStandingRow(standing: ConstructorStanding) {
 }
 
 
-// --- RaceCard és RaceResultsDialog (Változatlan ebben a lépésben) ---
+// --- RaceCard és RaceResultsDialog ---
 @Composable
 fun RaceCard(race: Race, onClick: () -> Unit) {
     Card(
@@ -779,12 +767,12 @@ fun RaceCard(race: Race, onClick: () -> Unit) {
             )
             Spacer(modifier = Modifier.height(4.dp))
             Text(
-                text = "Round: ${race.round}, Date: ${race.date}", // Angolra váltva
+                text = "Round: ${race.round}, Date: ${race.date}",
                 style = MaterialTheme.typography.body2
             )
             Spacer(modifier = Modifier.height(8.dp))
             Text(
-                text = "Circuit: ${race.circuit.circuitName}", // Angolra váltva
+                text = "Circuit: ${race.circuit.circuitName}",
                 style = MaterialTheme.typography.subtitle1
             )
             Text(
@@ -834,7 +822,7 @@ fun RaceResultsDialog(
                     }
                     error != null -> {
                         Box(modifier = Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
-                            Text("Error: $error", color = MaterialTheme.colors.error) // Angolra váltva
+                            Text("Error: $error", color = MaterialTheme.colors.error)
                         }
                     }
                     !results.isNullOrEmpty() -> {
@@ -846,10 +834,10 @@ fun RaceResultsDialog(
                                 ) {
                                     Text("Pos", fontWeight = FontWeight.Bold, modifier = Modifier.width(50.dp))
                                     Text("No", fontWeight = FontWeight.Bold, modifier = Modifier.width(50.dp))
-                                    Text("Driver", fontWeight = FontWeight.Bold, modifier = Modifier.weight(2f)) // Angolra váltva
-                                    Text("Team", fontWeight = FontWeight.Bold, modifier = Modifier.weight(2f)) // Angolra váltva
-                                    Text("Laps", fontWeight = FontWeight.Bold, modifier = Modifier.width(50.dp)) // Angolra váltva
-                                    Text("Time/Status", fontWeight = FontWeight.Bold, modifier = Modifier.weight(1.5f)) // Angolra váltva
+                                    Text("Driver", fontWeight = FontWeight.Bold, modifier = Modifier.weight(2f))
+                                    Text("Team", fontWeight = FontWeight.Bold, modifier = Modifier.weight(2f))
+                                    Text("Laps", fontWeight = FontWeight.Bold, modifier = Modifier.width(50.dp))
+                                    Text("Time/Status", fontWeight = FontWeight.Bold, modifier = Modifier.weight(1.5f))
                                     Text("Pts", fontWeight = FontWeight.Bold, modifier = Modifier.width(40.dp))
                                 }
                                 Divider()
@@ -889,7 +877,7 @@ fun RaceResultsDialog(
                     }
                     else -> {
                         Box(modifier = Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
-                            Text("No results available.") // Angolra váltva
+                            Text("No results available.")
                         }
                     }
                 }
@@ -900,13 +888,11 @@ fun RaceResultsDialog(
                     onClick = onDismissRequest,
                     modifier = Modifier.align(Alignment.End)
                 ) {
-                    Text("Close") // Angolra váltva
+                    Text("Close")
                 }
             }
         }
     }
 }
-
-
 
 

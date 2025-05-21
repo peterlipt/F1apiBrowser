@@ -164,7 +164,7 @@ data class DriverStanding(
 
 @Serializable
 data class ConstructorStanding(
-    val position: String,
+    val position: String? = null, // Made nullable
     val positionText: String,
     val points: String,
     val wins: String,
